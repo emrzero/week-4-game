@@ -12,7 +12,7 @@ var fighters = {
     attackPower: 8,
     counterAttackPower: 16,
     name: "Rayman",
-    picture: "rayman.jpg"
+    picture: "rayman.png"
   },
 
   fighter2 : {
@@ -20,15 +20,15 @@ var fighters = {
     attackPower: 5,
     counterAttackPower: 5,
     name: "Globox",
-    picture: "globox.jpg"
+    picture: "globox.png"
   },
 
   fighter3 : {
     hp : 150,
     attackPower: 20,
     counterAttackPower: 20,
-    name: "Admiral Razorbeard",
-    picture: "az.jpg"
+    name: "Betilla",
+    picture: "betilla.png"
   },
 
   fighter4 : {
@@ -36,7 +36,7 @@ var fighters = {
     attackPower: 25,
     counterAttackPower: 25,
     name: "Polokus",
-    picture: "polokus.jpg"
+    picture: "polokus.png"
   }
 };
 
@@ -51,31 +51,70 @@ var game = {
   inProgress: false,
   over : false,
 
-  match : {}
+  match : {},
+  victory: false
 
 }
+
+// var htmlOutput = {
+//   write : function(tag, msg){
+
+//   },
+// }
 
 //TEST construction html objects based on fighters object
-for (f in fighters){
-  var newFighter = $('<div>');
-  newFighter.addClass("fighterBox");
-  newFighter.attr('value', fighters[f].name.toLowerCase())
-  newFighter.attr('hp',fighters[f].hp);
-  newFighter.attr('ap', fighters[f].attackPower);
-  newFighter.attr('cap', fighters[f].counterAttackPower);
-  newFighter.attr('id', f);
+// function resetGame(fighters) {
+//   $(".fighterBox").remove();
 
-  $("#fighterSelection").append(newFighter);
-}
+
+  for (f in fighters){
+    var newFighter = $('<div>');
+    newFighter.addClass("fighterBox");
+    newFighter.attr('value', fighters[f].name.toLowerCase())
+    newFighter.attr('hp',fighters[f].hp);
+    newFighter.attr('ap', fighters[f].attackPower);
+    newFighter.attr('cap', fighters[f].counterAttackPower);
+    newFighter.attr('id', f);
+
+    var backImg = $('<img>');
+    backImg.addClass("bi");
+    backImg.attr("src", imagesDir + fighters[f].picture);
+
+    newFighter.append(backImg);
+
+    var fighterName = $('<span>');
+    fighterName.addClass('fighterSpecs');
+    fighterName.append(fighters[f].name);
+
+    newFighter.append(fighterName);
+
+    var fighterHP = $('<span>');
+    fighterHP.addClass('hp');
+    fighterHP.attr('id', "hp-" + f);
+    fighterHP.append("HP: " + fighters[f].hp);
+
+    newFighter.append(fighterHP);
+
+    $("#fighterSelection").append(newFighter);
+  }
+// }
 //Functions
 
-function intializeGame() {
+function initializeGame() {
   game.player = "";
   game.bolPlayerChosen = false;
   game.enemy = "";
   game.bolEnemyChosen = false;
   game.match = {};
+  resetGame();
 };
+
+function newEnemy (){
+  game.enemy = "";
+  game.bolEnemyChosen = false;
+  game.over = false;
+};
+
 
 function setupMatch() {
   console.log("setup match");
@@ -88,6 +127,7 @@ function attack(f1, f2){
 
   var newHP = parseInt($(strF2).attr('hp')) - parseInt($(strF1).attr('ap'));
   $(strF2).attr('hp', newHP);
+  console.log($(strF2).attr('hp'));
 
   var newAP = parseInt($(strF1).attr('ap')) + parseInt(game.apAdder);
   $(strF1).attr('ap', newAP);
@@ -104,13 +144,11 @@ function counterAttack (f1, f2){
   var newHP = parseInt($(strF1).attr('hp')) - parseInt($(strF2).attr('ap'));
   $(strF1).attr('hp', newHP);
 
+  console.log ("Your new HP is " + $(strF1).attr('hp'));
+
 }
 
-function newEnemy (){
-  game.enemy = "";
-  game.bolEnemyChosen = false;
-};
-
+// initializeGame(fighters);
 
 
 //Listeners
@@ -137,20 +175,50 @@ $(".fighterBox").on("click", function(){
 
 
 $("#attack").on("click", function(){
-  if (game.over == true){
+
+  if (game.bolEnemyChosen == false){
+    console.log("choose an enemy");
+  }
+
+  else if (game.over == false && game.bolEnemyChosen ==false){
     console.log("You obliterated your enemy! Choose a new opponent.");
-    newEnemy();
+    
   } 
 
-  else if (fighters[game.enemy].hp < 0){
-    console.log("match is over");
-    game.over = true;
+  // else if (parseInt($('#' + game.enemy).attr('hp')) < 0){
+  //   console.log("match is over");
+  //   game.over = true;
 
-  } 
+  //   $('#' + game.enemy).remove();
+  //   newEnemy();
+
+
+  // } 
+
+  // else if ((parseInt($('#' + game.player).attr('hp')))< 0) {
+  //   console.log("Critical hit. You lost the match");
+  //   game.over = true;
+
+  // }
 
   else if (game.bolPlayerChosen && game.bolEnemyChosen && game.over == false){
     attack(game.player, game.enemy);
     counterAttack(game.player, game.enemy);
+
+    //Nested If statements
+    if (parseInt($('#' + game.enemy).attr('hp')) < 0){
+      console.log("match is over");
+      $('#' + game.enemy).remove();
+      newEnemy();
+
+
+    } 
+
+    else if ((parseInt($('#' + game.player).attr('hp')))< 0) {
+      console.log("Critical hit. You lost the match");
+      game.over = true;
+
+    } //End Nested If statements
   } 
   
 });
