@@ -1,7 +1,9 @@
 //StarWars RPG
-
-// $( document ).ready(function() {
-
+$(document).ready(function(){
+  $('#main').hide();
+  $().delay(50000);
+  $('#main').fadeIn('slow');
+// });
 //Data
 
 var imagesDir = "assets/images/";
@@ -223,6 +225,6 @@ $("#attack").on("click", function(){
   
 });
 
-
+});
 
 // }); //END document.ready()
