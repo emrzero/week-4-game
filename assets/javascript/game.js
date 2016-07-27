@@ -202,6 +202,10 @@ function msgFeedbackEn () {
   $('#attack').css('display', 'inline-block');
   $('#output').fadeIn(1000);
 }
+
+function msgYouWon(){
+  game.write("#output","You won!");
+}
 // initializeGame(fighters);
 
 
@@ -267,8 +271,9 @@ $("#attack").on("click", function(){
     //Nested If statements
     if (parseInt($('#' + game.enemy).attr('hp')) < 0){
       game.output.html("Match is over");
+      setTimeout(msgYouWon, 1000);
       $('#' + game.enemy).remove();
-      newEnemy();
+      setTimeout(newEnemy, 1000);
       
 
 
