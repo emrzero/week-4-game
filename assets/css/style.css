@@ -2,24 +2,35 @@
 * {
   color: #fff;
   font-family: 'Indie Flower', cursive;
+  text-align: center;
 }
 
 body {
   background-image: url("../images/bg.jpg");
-  background-size: cover;
+  background-height: 100%;
   background-repeat: no-repeat;
 }
 
-main {
+h1 {
+  font-size: 48px;
+}
+
+#content {
   width: 90%;
   margin: 0 auto;
-  background: rgba(54, 25, 25, .5);
+  padding: 10px;
+  background: rgba(54, 25, 25, .7 );
+}
+
+#attack {
+  display: none;
 }
 
 .fighterBox {
   width: 300px;
   height: 350px;
   display: inline-block;
+  margin: 0 auto;
 }
 
 .fighterBox:hover {
@@ -47,4 +58,10 @@ main {
   /*height: 500px;*/
   margin: 10px 0;
   /*background: rgba(54, 25, 25, .5);*/
+}
+
+
+button {
+  background-color: #c30700;
+  vertical-align: center;
 }

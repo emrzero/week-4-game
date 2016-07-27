@@ -1,8 +1,7 @@
-//StarWars RPG
+//Rayman RPG
 $(document).ready(function(){
-  $('#main').hide();
-  $().delay(50000);
-  $('#main').fadeIn('slow');
+  $('main').hide();
+  var fade = $('main').fadeIn(3000);
 // });
 //Data
 
@@ -53,8 +52,16 @@ var game = {
   inProgress: false,
   over : false,
 
-  match : {},
-  victory: false
+  victory: false,
+
+  numEnemiesLeft: 0,
+
+  write: function(i, msg){
+
+    $(i).html(msg);
+  },
+
+  output :  $('#output')
 
 }
 
@@ -65,11 +72,12 @@ var game = {
 // }
 
 //TEST construction html objects based on fighters object
-// function resetGame(fighters) {
-//   $(".fighterBox").remove();
-
+function resetGame() {
+  $(".fighterBox").remove();
 
   for (f in fighters){
+    game.numEnemiesLeft++;
+
     var newFighter = $('<div>');
     newFighter.addClass("fighterBox");
     newFighter.attr('value', fighters[f].name.toLowerCase())
@@ -98,28 +106,30 @@ var game = {
     newFighter.append(fighterHP);
 
     $("#fighterSelection").append(newFighter);
+    $('#output').html('');
   }
-// }
+}
+
+// resetGame();
 //Functions
 
+
 function initializeGame() {
+  game.over = false;
   game.player = "";
   game.bolPlayerChosen = false;
   game.enemy = "";
   game.bolEnemyChosen = false;
-  game.match = {};
   resetGame();
 };
+
+initializeGame();
 
 function newEnemy (){
   game.enemy = "";
   game.bolEnemyChosen = false;
   game.over = false;
-};
-
-
-function setupMatch() {
-  console.log("setup match");
+  game.numEnemiesLeft--;
 };
 
 function attack(f1, f2){
@@ -129,11 +139,11 @@ function attack(f1, f2){
 
   var newHP = parseInt($(strF2).attr('hp')) - parseInt($(strF1).attr('ap'));
   $(strF2).attr('hp', newHP);
-  console.log($(strF2).attr('hp'));
+  game.write($(strF2).attr('hp'));
 
   var newAP = parseInt($(strF1).attr('ap')) + parseInt(game.apAdder);
   $(strF1).attr('ap', newAP);
-  console.log("Your attack power is now " + $(strF1).attr('ap'));
+  game.write("#hp-" + f2, "HP: " + $(strF1).attr('hp'));
 
 };
 
@@ -146,31 +156,71 @@ function counterAttack (f1, f2){
   var newHP = parseInt($(strF1).attr('hp')) - parseInt($(strF2).attr('ap'));
   $(strF1).attr('hp', newHP);
 
-  console.log ("Your new HP is " + $(strF1).attr('hp'));
+  game.write("#hp-" + f1, "HP: " + $(strF1).attr('hp'));
 
 }
 
+function btnNewGame(){
+  var newButton = $('<button>');
+  newButton.click(function(){
+    // initializeGame();
+    location.reload();
+  });
+  newButton.html("Restart game");
+  game.output.append(newButton);
+}
+
+function cleanDOM () {
+  $("#battleGround").attr("display", "inline-block");
+  $('header').fadeOut('slow');
+  $('main').animate({marginTop: '+=10px'}, 'slow');
+}
+
+
+function msgChooseEnemy () {
+  game.write('#output', "Choose an enemy");
+  $('#output').fadeOut(500).fadeIn(1000);
+}
+
+function msgFeedbackEn () {
+  $('#output').fadeOut(1000);
+  game.write('#output', " Your enemy is " + fighters[f].name);
+  $("#battleGround").append($(this));
+  $('#attack').css('display', 'inline-block');
+  $('#output').fadeIn(1000);
+}
 // initializeGame(fighters);
 
 
 //Listeners
 
 $(".fighterBox").on("click", function(){
-  var f = $(this).attr('id');
+  f = $(this).attr('id');
 
   if (game.bolPlayerChosen == false){
     game.player = f;
     game.bolPlayerChosen = true;
     game.apAdder = $(this).attr('ap');
-    console.log(" You've chosen " + f);
     $("#battleGround").prepend($(this));
+    cleanDOM();
+    msgChooseEnemy();
+
   } 
+  else if (f == game.player){
+    msgChooseEnemy();
+  }
+
 
   else if (game.bolEnemyChosen == false){
     game.enemy = f;
     game.bolEnemyChosen = true;
-    console.log(" Your enemy is " + f);
+    // msgFeedbackEn();
+    game.write('#output', " Your enemy is " + fighters[f].name);
     $("#battleGround").append($(this));
+    $('#attack').css('display', 'inline-block');
+    $('#output').fadeOut(500).fadeIn(1000);
+    $('#attack').fadeOut(1000).fadeIn(500);
+    
   }
 });
 
@@ -178,50 +228,51 @@ $(".fighterBox").on("click", function(){
 
 $("#attack").on("click", function(){
 
-  if (game.bolEnemyChosen == false){
-    console.log("choose an enemy");
+  if (game.bolEnemyChosen == false && game.bolPlayerChosen == true){
+    msgChooseEnemy();
   }
 
-  else if (game.over == false && game.bolEnemyChosen ==false){
-    console.log("You obliterated your enemy! Choose a new opponent.");
+  else if (game.over == false && game.bolEnemyChosen ==false && game.bolPlayerChosen == true){
+    game.write('#ouput', "You obliterated your enemy! Choose a new opponent.");
     
   } 
-
-  // else if (parseInt($('#' + game.enemy).attr('hp')) < 0){
-  //   console.log("match is over");
-  //   game.over = true;
-
-  //   $('#' + game.enemy).remove();
-  //   newEnemy();
-
-
-  // } 
-
-  // else if ((parseInt($('#' + game.player).attr('hp')))< 0) {
-  //   console.log("Critical hit. You lost the match");
-  //   game.over = true;
-
-  // }
 
   else if (game.bolPlayerChosen && game.bolEnemyChosen && game.over == false){
     attack(game.player, game.enemy);
     counterAttack(game.player, game.enemy);
+    var msg = "Your attack power is " + $('#' + game.player).attr('ap');
+    game.write("#output", msg);
+
+    // $().delay(30000);
+    // game.write('');
+
 
     //Nested If statements
     if (parseInt($('#' + game.enemy).attr('hp')) < 0){
-      console.log("match is over");
+      game.output.html("Match is over");
       $('#' + game.enemy).remove();
       newEnemy();
+      setTimeout(msgChooseEnemy, 2000);
 
 
     } 
 
     else if ((parseInt($('#' + game.player).attr('hp')))< 0) {
-      console.log("Critical hit. You lost the match");
+      game.output.html("Critical hit. You lost the match");
+      btnNewGame();
       game.over = true;
 
     } //End Nested If statements
   } 
+
+  if (game.numEnemiesLeft < 1){
+    game.write('#output', "Congratulations, you beat all your opponents!");
+    $('#output').css('color', '#c30700');
+    $('#output').css('font-size', '24px');
+
+    $('#output').fadeOut(500).fadeIn(1000);
+
+  }
   
 });
 
