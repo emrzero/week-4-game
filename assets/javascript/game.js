@@ -54,7 +54,7 @@ var game = {
 
   victory: false,
 
-  numEnemiesLeft: 0,
+  numEnemiesLeft: -1,
 
   write: function(i, msg){
 
@@ -124,12 +124,23 @@ function initializeGame() {
 };
 
 initializeGame();
+console.log("Enemies: " + game.numEnemiesLeft);
 
 function newEnemy (){
-  game.enemy = "";
-  game.bolEnemyChosen = false;
-  game.over = false;
-  game.numEnemiesLeft--;
+  if (game.numEnemiesLeft < 1){
+    game.write('#output', "Congratulations, you beat all your opponents!");
+    $('#output').css('color', '#c30700');
+    $('#output').css('font-size', '24px');
+
+    $('#output').fadeOut(500).fadeIn(1000);
+    btnNewGame();
+
+  } else {
+      game.enemy = "";
+      game.bolEnemyChosen = false;
+      game.over = false;
+      setTimeout(msgChooseEnemy, 2000);
+    }
 };
 
 function attack(f1, f2){
@@ -149,7 +160,6 @@ function attack(f1, f2){
 
 function counterAttack (f1, f2){
 
-  console.log("Your enemy has counter attacked");
   var strF1 ="#" + f1;
   var strF2 ="#" + f2;
 
@@ -166,8 +176,9 @@ function btnNewGame(){
     // initializeGame();
     location.reload();
   });
+  $('#attack').remove();
   newButton.html("Restart game");
-  game.output.append(newButton);
+  $('#matchControls').append(newButton);
 }
 
 function cleanDOM () {
@@ -180,6 +191,8 @@ function cleanDOM () {
 function msgChooseEnemy () {
   game.write('#output', "Choose an enemy");
   $('#output').fadeOut(500).fadeIn(1000);
+  $('#fighterSelection').css('opacity', '1');
+  $('#fighterSelection').fadeOut(500).fadeIn(1000);
 }
 
 function msgFeedbackEn () {
@@ -206,7 +219,7 @@ $(".fighterBox").on("click", function(){
     msgChooseEnemy();
 
   } 
-  else if (f == game.player){
+  else if (f == game.player && game.bolEnemyChosen == false){
     msgChooseEnemy();
   }
 
@@ -214,12 +227,14 @@ $(".fighterBox").on("click", function(){
   else if (game.bolEnemyChosen == false){
     game.enemy = f;
     game.bolEnemyChosen = true;
+    game.numEnemiesLeft--;
+    console.log("Enemies: " + game.numEnemiesLeft);
     // msgFeedbackEn();
     game.write('#output', " Your enemy is " + fighters[f].name);
     $("#battleGround").append($(this));
     $('#attack').css('display', 'inline-block');
-    $('#output').fadeOut(500).fadeIn(1000);
-    $('#attack').fadeOut(1000).fadeIn(500);
+
+    $('#fighterSelection').css('opacity', '0.3');
     
   }
 });
@@ -240,11 +255,13 @@ $("#attack").on("click", function(){
   else if (game.bolPlayerChosen && game.bolEnemyChosen && game.over == false){
     attack(game.player, game.enemy);
     counterAttack(game.player, game.enemy);
-    var msg = "Your attack power is " + $('#' + game.player).attr('ap');
-    game.write("#output", msg);
 
-    // $().delay(30000);
-    // game.write('');
+    e = $('#' + game.enemy)
+
+    var msg = "Your attack power is " + $('#' + game.player).attr('ap');
+    msg += "<br>";
+    msg += fighters[game.enemy].name + " attacked you for " + e.attr('cap') + " damage";
+    game.write("#output", msg);
 
 
     //Nested If statements
@@ -252,7 +269,7 @@ $("#attack").on("click", function(){
       game.output.html("Match is over");
       $('#' + game.enemy).remove();
       newEnemy();
-      setTimeout(msgChooseEnemy, 2000);
+      
 
 
     } 
@@ -263,16 +280,10 @@ $("#attack").on("click", function(){
       game.over = true;
 
     } //End Nested If statements
+
   } 
 
-  if (game.numEnemiesLeft < 1){
-    game.write('#output', "Congratulations, you beat all your opponents!");
-    $('#output').css('color', '#c30700');
-    $('#output').css('font-size', '24px');
-
-    $('#output').fadeOut(500).fadeIn(1000);
-
-  }
+  
   
 });
 

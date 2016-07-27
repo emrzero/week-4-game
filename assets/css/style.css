@@ -3,6 +3,7 @@
   color: #fff;
   font-family: 'Indie Flower', cursive;
   text-align: center;
+  border-radius: 25px;
 }
 
 body {
@@ -51,7 +52,8 @@ h1 {
 }
 
 .hp {
-  
+  font-weight: bold;
+  font-size: 24px;
 }
 
 #battleGround {
@@ -63,5 +65,12 @@ h1 {
 
 button {
   background-color: #c30700;
-  vertical-align: center;
+  border: none;
+  outline: 0;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+button:active {
+  opacity: 0.8;
 }
