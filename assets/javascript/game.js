@@ -120,7 +120,9 @@ function initializeGame() {
   game.bolPlayerChosen = false;
   game.enemy = "";
   game.bolEnemyChosen = false;
-  resetGame();
+  resetGame();  
+  game.write('#output', "Choose your character");
+  setTimeout(msgChooseCharacter, 3000);
 };
 
 initializeGame();
@@ -187,7 +189,11 @@ function cleanDOM () {
   $('main').animate({marginTop: '+=10px'}, 'slow');
 }
 
+function msgChooseCharacter (){
+  
+  $('#output').fadeOut(1000).fadeIn(1000);
 
+}
 function msgChooseEnemy () {
   game.write('#output', "Choose an enemy");
   $('#output').fadeOut(500).fadeIn(1000);
